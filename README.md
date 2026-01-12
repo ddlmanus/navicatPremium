@@ -1,4 +1,4 @@
-# navicat16 mac版无限重置试用期脚本
+# navicat17 mac版无限重置试用期脚本
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
