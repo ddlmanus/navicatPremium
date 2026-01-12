@@ -14,7 +14,7 @@
 ## 使用说明
 
 - 从 [navicat premium](https://www.navicat.com.cn/download/navicat-premium) 官网下载最新版。安装并运行，选择试用14天。
-- 待试用到期后，运行重置脚本。`./reset_navicat.sh`
+- 待试用到期后，运行重置脚本。`./reset_navicat_new.sh`
 
 ## 原理说明
 
