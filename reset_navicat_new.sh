@@ -68,19 +68,34 @@ if [ -f "$plist_file" ]; then
     )
     
     for key in "${known_keys[@]}"; do
-        if /usr/libexec/PlistBuddy -c "Delete :$key" "$plist_file" 2>/dev/null; then
+        # 直接尝试删除，不预先检查是否存在，确保清理彻底
+        if defaults delete "$keychain_service" "$key" 2>/dev/null; then
             echo "  ✓ 已删除 key: $key"
+        else
+            # 如果删除失败，尝试读取看是否真的不存在
+            if defaults read "$keychain_service" "$key" >/dev/null 2>&1; then
+                 echo "  ✗ 删除失败 key: $key (可能权限不足或被锁定)"
+            else
+                 echo "  - key 不存在: $key"
+            fi
         fi
     done
     
     # 动态查找并删除所有 32 位哈希值格式的顶级 key
-    while IFS= read -r key; do
-        if [[ $key =~ ^[0-9A-F]{32}$ ]]; then
-            if /usr/libexec/PlistBuddy -c "Delete :$key" "$plist_file" 2>/dev/null; then
-                echo "  ✓ 已删除动态 key: $key"
+    # 使用 PlistBuddy 查找 key
+    dynamic_keys=$(/usr/libexec/PlistBuddy -c "Print" "$plist_file" 2>/dev/null | grep -E "^    [0-9A-F]{32} = " | awk '{print $1}')
+
+    if [ -n "$dynamic_keys" ]; then
+        echo "$dynamic_keys" | while IFS= read -r key; do
+            if [[ $key =~ ^[0-9A-F]{32}$ ]]; then
+                 if defaults delete "$keychain_service" "$key" 2>/dev/null; then
+                    echo "  ✓ 已删除动态 key: $key"
+                 else
+                    echo "  ✗ 删除失败动态 key: $key"
+                 fi
             fi
-        fi
-    done < <(/usr/libexec/PlistBuddy -c "Print" "$plist_file" 2>/dev/null | grep -E "^    [0-9A-F]{32} = " | awk '{print $1}')
+        done
+    fi
 else
     echo "  ⚠ plist 文件不存在，跳过"
 fi
@@ -116,6 +131,12 @@ if [ -d "$hidden_dir" ]; then
             echo "  ✓ 已删除: $(basename "$file")"
         fi
     done
+    
+    # 同时删除 info.plist，因为可能包含相关状态信息
+    if [ -f "$hidden_dir/info.plist" ]; then
+        rm -f "$hidden_dir/info.plist"
+        echo "  ✓ 已删除: info.plist"
+    fi
 else
     echo "  ⚠ 隐藏文件目录不存在，跳过"
 fi
