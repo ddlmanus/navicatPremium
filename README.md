@@ -16,8 +16,20 @@
 
 ## Usage Instructions
 
-- Download the latest version from the [Navicat Premium](https://www.navicat.com.cn/download/navicat-premium) official website. Install and run it, selecting the 14-day trial.
-- When the trial expires, run the reset script: `./reset_navicat_new.sh`
+- **Download**: Download the latest version from the [Navicat Premium](https://www.navicat.com.cn/download/navicat-premium) official website.
+
+### macOS
+1. Open Terminal and navigate to this folder.
+2. Run the installer script:
+   ```bash
+   ./install.sh
+   ```
+   *This will set up a background task to automatically reset the trial every night at 12:00 AM. You never need to run it manually again.*
+
+### Windows
+1. Open the folder in File Explorer.
+2. Right-click on **`install.bat`** and select **"Run as Administrator"**.
+   *This will create a Scheduled Task to automatically reset the registry keys every night at 12:00 AM.*
 
 ## How It Works
 
